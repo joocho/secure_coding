@@ -1,0 +1,37 @@
+INFO: Running with entropic power schedule (0xFF, 100).
+INFO: Seed: 21308242
+INFO: Loaded 1 modules   (40 inline 8-bit counters): 40 [0x5568920c0ef0, 0x5568920c0f18), 
+INFO: Loaded 1 PC tables (40 PCs): 40 [0x5568920c0f18,0x5568920c1198), 
+INFO:       25 files found in corpus_libfuzzer/
+INFO: seed corpus: files: 25 min: 2b max: 24b total: 268b rss: 32Mb
+#27	INITED cov: 25 ft: 38 corp: 15/135b exec/s: 0 rss: 33Mb
+#34	NEW    cov: 26 ft: 39 corp: 16/136b lim: 22 exec/s: 0 rss: 33Mb L: 1/22 MS: 2 ChangeByte-CrossOver-
+#35	NEW    cov: 27 ft: 40 corp: 17/137b lim: 22 exec/s: 0 rss: 33Mb L: 1/22 MS: 1 CrossOver-
+AddressSanitizer:DEADLYSIGNAL
+=================================================================
+==167161==ERROR: AddressSanitizer: SEGV on unknown address 0x000000000001 (pc 0x556892053f70 bp 0x7ffd6de9e830 sp 0x7ffd6de9dfb8 T0)
+==167161==The signal is caused by a READ memory access.
+==167161==Hint: address points to the zero page.
+    #0 0x556892053f70 in __sanitizer::internal_strlen(char const*) (/home/jooye/suwon-uni/secure_coding/fuzz-test/fuzz_libfuzzer+0x118f70) (BuildId: 8b270e830fe6f6a723204604b863982d562d657b)
+    #1 0x556891fc6041 in printf_common(void*, char const*, __va_list_tag*) asan_interceptors.cpp.o
+    #2 0x556891fc7bfd in printf (/home/jooye/suwon-uni/secure_coding/fuzz-test/fuzz_libfuzzer+0x8cbfd) (BuildId: 8b270e830fe6f6a723204604b863982d562d657b)
+    #3 0x55689207ac6b in parse_config /home/jooye/suwon-uni/secure_coding/fuzz-test/vulnerable_lib.c:138:5
+    #4 0x55689207a405 in LLVMFuzzerTestOneInput /home/jooye/suwon-uni/secure_coding/fuzz-test/fuzz_libfuzzer.c:41:17
+    #5 0x556891f87ca4 in fuzzer::Fuzzer::ExecuteCallback(unsigned char const*, unsigned long) (/home/jooye/suwon-uni/secure_coding/fuzz-test/fuzz_libfuzzer+0x4cca4) (BuildId: 8b270e830fe6f6a723204604b863982d562d657b)
+    #6 0x556891f87399 in fuzzer::Fuzzer::RunOne(unsigned char const*, unsigned long, bool, fuzzer::InputInfo*, bool, bool*) (/home/jooye/suwon-uni/secure_coding/fuzz-test/fuzz_libfuzzer+0x4c399) (BuildId: 8b270e830fe6f6a723204604b863982d562d657b)
+    #7 0x556891f88b85 in fuzzer::Fuzzer::MutateAndTestOne() (/home/jooye/suwon-uni/secure_coding/fuzz-test/fuzz_libfuzzer+0x4db85) (BuildId: 8b270e830fe6f6a723204604b863982d562d657b)
+    #8 0x556891f896e5 in fuzzer::Fuzzer::Loop(std::vector<fuzzer::SizedFile, std::allocator<fuzzer::SizedFile>>&) (/home/jooye/suwon-uni/secure_coding/fuzz-test/fuzz_libfuzzer+0x4e6e5) (BuildId: 8b270e830fe6f6a723204604b863982d562d657b)
+    #9 0x556891f769bf in fuzzer::FuzzerDriver(int*, char***, int (*)(unsigned char const*, unsigned long)) (/home/jooye/suwon-uni/secure_coding/fuzz-test/fuzz_libfuzzer+0x3b9bf) (BuildId: 8b270e830fe6f6a723204604b863982d562d657b)
+    #10 0x556891fa1046 in main (/home/jooye/suwon-uni/secure_coding/fuzz-test/fuzz_libfuzzer+0x66046) (BuildId: 8b270e830fe6f6a723204604b863982d562d657b)
+    #11 0x7a6c2262a1c9  (/lib/x86_64-linux-gnu/libc.so.6+0x2a1c9) (BuildId: 8e9fd827446c24067541ac5390e6f527fb5947bb)
+    #12 0x7a6c2262a28a in __libc_start_main (/lib/x86_64-linux-gnu/libc.so.6+0x2a28a) (BuildId: 8e9fd827446c24067541ac5390e6f527fb5947bb)
+    #13 0x556891f6b9a4 in _start (/home/jooye/suwon-uni/secure_coding/fuzz-test/fuzz_libfuzzer+0x309a4) (BuildId: 8b270e830fe6f6a723204604b863982d562d657b)
+
+AddressSanitizer can not provide additional info.
+SUMMARY: AddressSanitizer: SEGV (/home/jooye/suwon-uni/secure_coding/fuzz-test/fuzz_libfuzzer+0x118f70) (BuildId: 8b270e830fe6f6a723204604b863982d562d657b) in __sanitizer::internal_strlen(char const*)
+==167161==ABORTING
+MS: 5 ChangeBinInt-CMP-CMP-CopyPart-CMP- DE: "\377\377\377\377"-"\001\000\377\000"-"@\221\000\000"-; base unit: 0da16c92c81ea813d7453235f9cdcfc26356e753
+0x40,0x91,0x0,0x0,0xff,0xff,0xff,0x0,0x1,0x0,0xff,0x0,0xff,0xff,0x4,0xbc,
+@\221\000\000\377\377\377\000\001\000\377\000\377\377\004\274
+artifact_prefix='./'; Test unit written to ./crash-ab98f0565c604ceae789404c3fdf50780c1b93a5
+Base64: QJEAAP///wABAP8A//8EvA==
