@@ -208,3 +208,40 @@ model('image.jpg', classes=[0, 2]) 처럼 옵션을 주어 필터링
 
 추론 결과 데이터 구조를 분해하여, 탐지된 '사람'의 수를 세고 조건문을 처리
 
+```python
+while cap.isOpened():
+    ret, frame = cap.read()
+    if not ret:
+        break
+
+    # 1. AI 분석 (추론)
+    results = model(frame, verbose=False)
+    
+    # 2. '사람(Class 0)'만 필터링하여 숫자 세기
+    # results[0].boxes.cls에 탐지된 모든 물체의 ID가 들어있습니다.
+    person_count = 0
+    for box in results[0].boxes:
+        class_id = int(box.cls[0]) # 객체의 클래스 번호 추출
+        if class_id == 0:          # 0번은 'person' (사람)
+            person_count += 1
+
+    # 3. 시각화 (기본 박스 그리기)
+    res_plotted = results[0].plot()
+
+    # 4. 조건문 처리: 3명 이상일 때 경보 문구 표시
+    if person_count >= 3:
+        # 경고 문구 (빨간색)
+        alert_text = f"ALERT: {person_count} PERSONS DETECTED!"
+        cv2.putText(res_plotted, alert_text, (50, 100), 
+                    cv2.FONT_HERSHEY_SIMPLEX, 1.5, (0, 0, 255), 4)
+        
+        # 실제 실무라면 여기서 이메일 발송, 경보음 재생, 혹은 SMS 전송 함수를 호출합니다.
+        # print("경보 발령: 거동수상자 다수 포착!") 
+    else:
+        # 정상 상태 표시 (녹색)
+        cv2.putText(res_plotted, f"Monitoring... (Count: {person_count})", (50, 100), 
+                    cv2.FONT_HERSHEY_SIMPLEX, 1.0, (0, 255, 0), 2)
+
+    # 결과 프레임 저장
+    out.write(res_plotted)
+```

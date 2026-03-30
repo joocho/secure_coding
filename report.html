@@ -1,0 +1,241 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+
+<meta charset="UTF-8">
+
+<title>
+    Bandit Report
+</title>
+
+<style>
+
+html * {
+    font-family: "Arial", sans-serif;
+}
+
+pre {
+    font-family: "Monaco", monospace;
+}
+
+.bordered-box {
+    border: 1px solid black;
+    padding-top:.5em;
+    padding-bottom:.5em;
+    padding-left:1em;
+}
+
+.metrics-box {
+    font-size: 1.1em;
+    line-height: 130%;
+}
+
+.metrics-title {
+    font-size: 1.5em;
+    font-weight: 500;
+    margin-bottom: .25em;
+}
+
+.issue-description {
+    font-size: 1.3em;
+    font-weight: 500;
+}
+
+.candidate-issues {
+    margin-left: 2em;
+    border-left: solid 1px; LightGray;
+    padding-left: 5%;
+    margin-top: .2em;
+    margin-bottom: .2em;
+}
+
+.issue-block {
+    border: 1px solid LightGray;
+    padding-left: .5em;
+    padding-top: .5em;
+    padding-bottom: .5em;
+    margin-bottom: .5em;
+}
+
+.issue-sev-high {
+    background-color: Pink;
+}
+
+.issue-sev-medium {
+    background-color: NavajoWhite;
+}
+
+.issue-sev-low {
+    background-color: LightCyan;
+}
+
+</style>
+</head>
+
+<body>
+
+<div id="metrics">
+    <div class="metrics-box bordered-box">
+        <div class="metrics-title">
+            Metrics:<br>
+        </div>
+        Total lines of code: <span id="loc">88</span><br>
+        Total lines skipped (#nosec): <span id="nosec">0</span>
+    </div>
+</div>
+
+
+
+<br>
+<div id="skipped">
+<div class="bordered-box">
+<b>Skipped files:</b><br><br>
+sast/lab_code/vulnerable_file.py <b>reason:</b> syntax error while parsing AST from file<br>sast/lab_code/vulnerable_login.py <b>reason:</b> syntax error while parsing AST from file<br>
+</div>
+</div>
+
+
+<br>
+<div id="results">
+    
+<div id="issue-0">
+<div class="issue-block issue-sev-high">
+    <b>flask_debug_true: </b> A Flask app appears to be run with debug=True, which exposes the Werkzeug debugger and allows the execution of arbitrary code.<br>
+    <b>Test ID:</b> B201<br>
+    <b>Severity: </b>HIGH<br>
+    <b>Confidence: </b>MEDIUM<br>
+    <b>CWE: </b><a href="https://cwe.mitre.org/data/definitions/94.html" target="_blank">CWE-94</a><br>
+    <b>File: </b><a href="sast/lab_code/vulnerable_board.py" target="_blank">sast/lab_code/vulnerable_board.py</a><br>
+    <b>Line number: </b>32<br>
+    <b>More info: </b><a href="https://bandit.readthedocs.io/en/1.9.4/plugins/b201_flask_debug_true.html" target="_blank">https://bandit.readthedocs.io/en/1.9.4/plugins/b201_flask_debug_true.html</a><br>
+
+<div class="code">
+<pre>
+31	if __name__ == &quot;__main__&quot;:
+32	    app.run(debug=True)
+</pre>
+</div>
+
+
+</div>
+</div>
+
+<div id="issue-1">
+<div class="issue-block issue-sev-low">
+    <b>hardcoded_password_string: </b> Possible hardcoded password: 'admin1234'<br>
+    <b>Test ID:</b> B105<br>
+    <b>Severity: </b>LOW<br>
+    <b>Confidence: </b>MEDIUM<br>
+    <b>CWE: </b><a href="https://cwe.mitre.org/data/definitions/259.html" target="_blank">CWE-259</a><br>
+    <b>File: </b><a href="sast/lab_code/vulnerable_config.py" target="_blank">sast/lab_code/vulnerable_config.py</a><br>
+    <b>Line number: </b>8<br>
+    <b>More info: </b><a href="https://bandit.readthedocs.io/en/1.9.4/plugins/b105_hardcoded_password_string.html" target="_blank">https://bandit.readthedocs.io/en/1.9.4/plugins/b105_hardcoded_password_string.html</a><br>
+
+<div class="code">
+<pre>
+7	# 하드코딩된 자격증명 — Bandit B105로 즉시 탐지
+8	ADMIN_PASSWORD = &quot;admin1234&quot;          # CWE-798
+9	DB_CONNECTION  = &quot;mysql://root:1234@192.168.1.10/militarydb&quot;  # CWE-798
+</pre>
+</div>
+
+
+</div>
+</div>
+
+<div id="issue-2">
+<div class="issue-block issue-sev-high">
+    <b>hashlib: </b> Use of weak MD5 hash for security. Consider usedforsecurity=False<br>
+    <b>Test ID:</b> B324<br>
+    <b>Severity: </b>HIGH<br>
+    <b>Confidence: </b>HIGH<br>
+    <b>CWE: </b><a href="https://cwe.mitre.org/data/definitions/327.html" target="_blank">CWE-327</a><br>
+    <b>File: </b><a href="sast/lab_code/vulnerable_config.py" target="_blank">sast/lab_code/vulnerable_config.py</a><br>
+    <b>Line number: </b>13<br>
+    <b>More info: </b><a href="https://bandit.readthedocs.io/en/1.9.4/plugins/b324_hashlib.html" target="_blank">https://bandit.readthedocs.io/en/1.9.4/plugins/b324_hashlib.html</a><br>
+
+<div class="code">
+<pre>
+12	    # MD5는 암호학적으로 취약한 해시 — Bandit B324, CWE-327
+13	    hashed = hashlib.md5(plain_text.encode()).hexdigest()
+14	    return hashed   # ← 레인보우 테이블로 역산 가능
+</pre>
+</div>
+
+
+</div>
+</div>
+
+<div id="issue-3">
+<div class="issue-block issue-sev-low">
+    <b>blacklist: </b> Consider possible security implications associated with pickle module.<br>
+    <b>Test ID:</b> B403<br>
+    <b>Severity: </b>LOW<br>
+    <b>Confidence: </b>HIGH<br>
+    <b>CWE: </b><a href="https://cwe.mitre.org/data/definitions/502.html" target="_blank">CWE-502</a><br>
+    <b>File: </b><a href="sast/lab_code/vulnerable_deserialize.py" target="_blank">sast/lab_code/vulnerable_deserialize.py</a><br>
+    <b>Line number: </b>5<br>
+    <b>More info: </b><a href="https://bandit.readthedocs.io/en/1.9.4/blacklists/blacklist_imports.html#b403-import-pickle" target="_blank">https://bandit.readthedocs.io/en/1.9.4/blacklists/blacklist_imports.html#b403-import-pickle</a><br>
+
+<div class="code">
+<pre>
+4	
+5	import pickle
+6	import base64
+</pre>
+</div>
+
+
+</div>
+</div>
+
+<div id="issue-4">
+<div class="issue-block issue-sev-medium">
+    <b>blacklist: </b> Pickle and modules that wrap it can be unsafe when used to deserialize untrusted data, possible security issue.<br>
+    <b>Test ID:</b> B301<br>
+    <b>Severity: </b>MEDIUM<br>
+    <b>Confidence: </b>HIGH<br>
+    <b>CWE: </b><a href="https://cwe.mitre.org/data/definitions/502.html" target="_blank">CWE-502</a><br>
+    <b>File: </b><a href="sast/lab_code/vulnerable_deserialize.py" target="_blank">sast/lab_code/vulnerable_deserialize.py</a><br>
+    <b>Line number: </b>17<br>
+    <b>More info: </b><a href="https://bandit.readthedocs.io/en/1.9.4/blacklists/blacklist_calls.html#b301-pickle" target="_blank">https://bandit.readthedocs.io/en/1.9.4/blacklists/blacklist_calls.html#b301-pickle</a><br>
+
+<div class="code">
+<pre>
+16	    decoded = base64.b64decode(session_data)
+17	    user_obj = pickle.loads(decoded)    # ← 원격 코드 실행(RCE) 가능
+18	
+</pre>
+</div>
+
+
+</div>
+</div>
+
+<div id="issue-5">
+<div class="issue-block issue-sev-high">
+    <b>flask_debug_true: </b> A Flask app appears to be run with debug=True, which exposes the Werkzeug debugger and allows the execution of arbitrary code.<br>
+    <b>Test ID:</b> B201<br>
+    <b>Severity: </b>HIGH<br>
+    <b>Confidence: </b>MEDIUM<br>
+    <b>CWE: </b><a href="https://cwe.mitre.org/data/definitions/94.html" target="_blank">CWE-94</a><br>
+    <b>File: </b><a href="sast/lab_code/vulnerable_deserialize.py" target="_blank">sast/lab_code/vulnerable_deserialize.py</a><br>
+    <b>Line number: </b>22<br>
+    <b>More info: </b><a href="https://bandit.readthedocs.io/en/1.9.4/plugins/b201_flask_debug_true.html" target="_blank">https://bandit.readthedocs.io/en/1.9.4/plugins/b201_flask_debug_true.html</a><br>
+
+<div class="code">
+<pre>
+21	if __name__ == &quot;__main__&quot;:
+22	    app.run(debug=True)
+</pre>
+</div>
+
+
+</div>
+</div>
+
+</div>
+
+</body>
+</html>
