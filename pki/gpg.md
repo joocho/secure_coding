@@ -20,8 +20,8 @@ Comment    → (엔터)
 ```
 
 Bob 키 생성 (같은 방식으로)
-```
-bashgpg --full-generate-key
+```bash
+gpg --full-generate-key
 ```
 
 ```
@@ -33,16 +33,16 @@ Email      → bob@test.com
 
 ② 키 확인
 
-```
-bashgpg --list-keys
+```bash
+gpg --list-keys
 ```
 
 Alice와 Bob 두 개의 키가 보여야 해요.
 
 ③ 공개키 내보내기
 
-```
-bashgpg --armor --export alice@test.com > alice_pub.asc
+```bash
+gpg --armor --export alice@test.com > alice_pub.asc
 gpg --armor --export bob@test.com   > bob_pub.asc
 cat alice_pub.asc   # 내용 확인
 ```
@@ -50,12 +50,12 @@ cat alice_pub.asc   # 내용 확인
 
 ④ 메시지 암호화 (Alice → Bob)
 Bob의 공개키로 암호화:
-```
-bashecho "안녕 Bob! 비밀 메시지야. - Alice" > message.txt
+```bash
+echo "안녕 Bob! 비밀 메시지야. - Alice" > message.txt
 gpg --armor --encrypt --recipient bob@test.com message.txt
 ```
 
-```
+```bash
 # message.txt.asc 파일 생성됨
 cat message.txt.asc   # 암호문 확인
 ```
@@ -63,8 +63,8 @@ cat message.txt.asc   # 암호문 확인
 ⑤ 복호화 (Bob이 읽기)
 
 Bob의 개인키로 복호화:
-```
-bashgpg --decrypt message.txt.asc
+```bash
+gpg --decrypt message.txt.asc
 # passphrase 입력: 123456
 ```
 
@@ -72,8 +72,8 @@ bashgpg --decrypt message.txt.asc
 
 ⑥ 서명 + 암호화 동시에
 
-```
-bashgpg --armor --sign --encrypt \
+```bash
+gpg --armor --sign --encrypt \
     --local-user alice@test.com \
     --recipient bob@test.com \
     message.txt
@@ -85,14 +85,13 @@ gpg --decrypt message.txt.asc
 ⑦ 서명만 (무결성 검증 실습)
 
 Bob이 서명
-```
-bash# 
+```bash
 gpg --armor --clearsign --local-user bob@test.com message.txt
 # message.txt.asc 생성
 ```
 
 Alice가 검증
-```
+```bash
 gpg --verify message.txt.asc
 
 # 파일 변조 후 재검증 → BAD signature 확인
