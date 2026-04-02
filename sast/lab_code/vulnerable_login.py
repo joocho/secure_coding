@@ -31,9 +31,5 @@ def login():
 
 if __name__ == "__main__":
     app.run(debug=True)     # ← debug=True 도 Bandit B201로 탐지됨
-```
 
-**공격 예시 입력값**
-```
-username: admin' --
-password: (아무 값)
+
