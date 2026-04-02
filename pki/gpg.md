@@ -4,8 +4,8 @@
 
 ① 키 생성
 Alice 키 생성
-```
-bashgpg --full-generate-key
+```bash
+gpg --full-generate-key
 ```
 질문에 대한 답 예시 (자신에 맞게 변경)
 ```
