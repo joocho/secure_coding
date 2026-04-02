@@ -1,0 +1,1237 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AEGIS AI — 국방 지원 시스템</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Noto+Sans+KR:wght@300;400;500;700&family=Rajdhani:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg-primary: #070d0f;
+    --bg-secondary: #0c1517;
+    --bg-tertiary: #111d20;
+    --bg-panel: #0f1a1d;
+    --accent-primary: #00e5c8;
+    --accent-secondary: #00b5a0;
+    --accent-dim: rgba(0, 229, 200, 0.08);
+    --accent-border: rgba(0, 229, 200, 0.25);
+    --text-primary: #e8f4f2;
+    --text-secondary: #7ab5b0;
+    --text-muted: #3d6b67;
+    --danger: #ff4757;
+    --warning: #ffa502;
+    --success: #00e5c8;
+    --border: rgba(0, 229, 200, 0.15);
+    --scan-line: rgba(0, 229, 200, 0.03);
+    --font-mono: 'Share Tech Mono', monospace;
+    --font-body: 'Noto Sans KR', sans-serif;
+    --font-display: 'Rajdhani', sans-serif;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    font-family: var(--font-body);
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    position: relative;
+  }
+
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background: repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 2px,
+      var(--scan-line) 2px,
+      var(--scan-line) 4px
+    );
+    pointer-events: none;
+    z-index: 1000;
+  }
+
+  /* TOP BAR */
+  .topbar {
+    background: var(--bg-secondary);
+    border-bottom: 1px solid var(--border);
+    padding: 0 24px;
+    height: 56px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-shrink: 0;
+    position: relative;
+    z-index: 10;
+  }
+
+  .topbar::after {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--accent-primary), transparent);
+    opacity: 0.5;
+  }
+
+  .logo {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .logo-icon {
+    width: 32px;
+    height: 32px;
+    position: relative;
+  }
+
+  .logo-icon svg { width: 100%; height: 100%; }
+
+  .logo-text {
+    font-family: var(--font-display);
+    font-size: 22px;
+    font-weight: 700;
+    letter-spacing: 4px;
+    color: var(--accent-primary);
+    text-shadow: 0 0 20px rgba(0, 229, 200, 0.4);
+  }
+
+  .logo-sub {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    color: var(--text-muted);
+    letter-spacing: 2px;
+    margin-top: 1px;
+  }
+
+  .status-bar {
+    display: flex;
+    align-items: center;
+    gap: 24px;
+  }
+
+  .status-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--text-muted);
+  }
+
+  .status-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--accent-primary);
+    animation: pulse 2s infinite;
+  }
+
+  .status-dot.warn { background: var(--warning); }
+  .status-dot.off { background: var(--text-muted); animation: none; }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; box-shadow: 0 0 4px var(--accent-primary); }
+    50% { opacity: 0.4; box-shadow: none; }
+  }
+
+  .clearance-badge {
+    font-family: var(--font-display);
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 2px;
+    padding: 4px 12px;
+    border: 1px solid rgba(255, 71, 87, 0.4);
+    color: var(--danger);
+    background: rgba(255, 71, 87, 0.08);
+  }
+
+  /* LAYOUT */
+  .main-layout {
+    display: flex;
+    flex: 1;
+    overflow: hidden;
+  }
+
+  /* LEFT SIDEBAR */
+  .sidebar {
+    width: 260px;
+    background: var(--bg-panel);
+    border-right: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    flex-shrink: 0;
+  }
+
+  .sidebar-section {
+    padding: 16px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .sidebar-label {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    color: var(--text-muted);
+    letter-spacing: 2px;
+    margin-bottom: 12px;
+  }
+
+  .model-info {
+    background: var(--accent-dim);
+    border: 1px solid var(--accent-border);
+    padding: 12px;
+    margin-bottom: 8px;
+  }
+
+  .model-name {
+    font-family: var(--font-display);
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--accent-primary);
+    letter-spacing: 1px;
+  }
+
+  .model-detail {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    color: var(--text-muted);
+    margin-top: 4px;
+  }
+
+  .model-selector {
+    width: 100%;
+    background: var(--bg-tertiary);
+    border: 1px solid var(--border);
+    color: var(--text-primary);
+    font-family: var(--font-mono);
+    font-size: 11px;
+    padding: 8px 10px;
+    cursor: pointer;
+    outline: none;
+    appearance: none;
+    margin-bottom: 8px;
+  }
+
+  .model-selector:focus { border-color: var(--accent-primary); }
+  .model-selector option { background: var(--bg-secondary); }
+
+  .param-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+  }
+
+  .param-label {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    color: var(--text-secondary);
+  }
+
+  .param-value {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--accent-primary);
+    min-width: 36px;
+    text-align: right;
+  }
+
+  .param-slider {
+    width: 100%;
+    accent-color: var(--accent-primary);
+    margin: 4px 0;
+    cursor: pointer;
+  }
+
+  /* MISSION PROFILES */
+  .mission-btn {
+    width: 100%;
+    background: var(--bg-tertiary);
+    border: 1px solid var(--border);
+    color: var(--text-secondary);
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: 1px;
+    padding: 8px 10px;
+    text-align: left;
+    cursor: pointer;
+    margin-bottom: 4px;
+    transition: all 0.15s;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .mission-btn:hover, .mission-btn.active {
+    background: var(--accent-dim);
+    border-color: var(--accent-border);
+    color: var(--accent-primary);
+  }
+
+  .mission-icon { font-size: 12px; }
+
+  /* CHAT HISTORY */
+  .history-section {
+    flex: 1;
+    padding: 16px;
+    overflow-y: auto;
+  }
+
+  .history-item {
+    padding: 8px 10px;
+    border-left: 2px solid transparent;
+    margin-bottom: 4px;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+
+  .history-item:hover {
+    border-left-color: var(--accent-primary);
+    background: var(--accent-dim);
+  }
+
+  .history-title {
+    font-size: 12px;
+    color: var(--text-secondary);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .history-time {
+    font-family: var(--font-mono);
+    font-size: 9px;
+    color: var(--text-muted);
+    margin-top: 2px;
+  }
+
+  .new-chat-btn {
+    margin: 16px;
+    padding: 10px;
+    background: var(--accent-dim);
+    border: 1px solid var(--accent-border);
+    color: var(--accent-primary);
+    font-family: var(--font-display);
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 2px;
+    cursor: pointer;
+    transition: all 0.15s;
+    text-align: center;
+  }
+
+  .new-chat-btn:hover {
+    background: rgba(0, 229, 200, 0.15);
+  }
+
+  /* CHAT AREA */
+  .chat-container {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    position: relative;
+  }
+
+  /* TACTICAL GRID BG */
+  .chat-container::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image:
+      linear-gradient(var(--border) 1px, transparent 1px),
+      linear-gradient(90deg, var(--border) 1px, transparent 1px);
+    background-size: 40px 40px;
+    opacity: 0.3;
+    pointer-events: none;
+  }
+
+  .messages-area {
+    flex: 1;
+    overflow-y: auto;
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    position: relative;
+    z-index: 1;
+    scroll-behavior: smooth;
+  }
+
+  .messages-area::-webkit-scrollbar { width: 4px; }
+  .messages-area::-webkit-scrollbar-track { background: transparent; }
+  .messages-area::-webkit-scrollbar-thumb { background: var(--text-muted); }
+
+  /* WELCOME SCREEN */
+  .welcome-screen {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    text-align: center;
+    padding: 40px;
+  }
+
+  .welcome-hex {
+    width: 80px;
+    height: 80px;
+    margin-bottom: 24px;
+    animation: rotate-hex 20s linear infinite;
+  }
+
+  @keyframes rotate-hex {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+  }
+
+  .welcome-title {
+    font-family: var(--font-display);
+    font-size: 32px;
+    font-weight: 700;
+    letter-spacing: 6px;
+    color: var(--accent-primary);
+    text-shadow: 0 0 30px rgba(0, 229, 200, 0.3);
+    margin-bottom: 8px;
+  }
+
+  .welcome-sub {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--text-muted);
+    letter-spacing: 3px;
+    margin-bottom: 40px;
+  }
+
+  .quick-actions {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    width: 100%;
+    max-width: 600px;
+  }
+
+  .quick-action {
+    background: var(--bg-panel);
+    border: 1px solid var(--border);
+    padding: 16px;
+    cursor: pointer;
+    text-align: left;
+    transition: all 0.2s;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .quick-action::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0;
+    width: 3px; height: 100%;
+    background: var(--accent-primary);
+    transform: scaleY(0);
+    transition: transform 0.2s;
+  }
+
+  .quick-action:hover {
+    border-color: var(--accent-border);
+    background: var(--accent-dim);
+  }
+
+  .quick-action:hover::before { transform: scaleY(1); }
+
+  .qa-tag {
+    font-family: var(--font-mono);
+    font-size: 9px;
+    color: var(--accent-primary);
+    letter-spacing: 2px;
+    margin-bottom: 6px;
+  }
+
+  .qa-text {
+    font-size: 13px;
+    color: var(--text-secondary);
+    line-height: 1.4;
+  }
+
+  /* MESSAGES */
+  .message {
+    display: flex;
+    gap: 16px;
+    animation: msg-in 0.2s ease-out;
+  }
+
+  @keyframes msg-in {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .message.user { flex-direction: row-reverse; }
+
+  .msg-avatar {
+    width: 36px;
+    height: 36px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--font-display);
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 1px;
+  }
+
+  .msg-avatar.ai {
+    background: var(--accent-dim);
+    border: 1px solid var(--accent-border);
+    color: var(--accent-primary);
+  }
+
+  .msg-avatar.user {
+    background: rgba(255, 71, 87, 0.08);
+    border: 1px solid rgba(255, 71, 87, 0.2);
+    color: var(--danger);
+  }
+
+  .msg-content {
+    flex: 1;
+    max-width: 75%;
+  }
+
+  .message.user .msg-content { align-items: flex-end; display: flex; flex-direction: column; }
+
+  .msg-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 6px;
+  }
+
+  .message.user .msg-header { flex-direction: row-reverse; }
+
+  .msg-sender {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    color: var(--text-muted);
+    letter-spacing: 1px;
+  }
+
+  .msg-time {
+    font-family: var(--font-mono);
+    font-size: 9px;
+    color: var(--text-muted);
+  }
+
+  .msg-bubble {
+    padding: 14px 18px;
+    font-size: 14px;
+    line-height: 1.7;
+    color: var(--text-primary);
+    position: relative;
+  }
+
+  .msg-bubble.ai {
+    background: var(--bg-panel);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--accent-primary);
+  }
+
+  .msg-bubble.user {
+    background: rgba(255, 71, 87, 0.06);
+    border: 1px solid rgba(255, 71, 87, 0.15);
+    border-right: 3px solid var(--danger);
+    text-align: right;
+  }
+
+  .msg-bubble pre {
+    background: rgba(0, 0, 0, 0.4);
+    border: 1px solid var(--border);
+    padding: 12px;
+    margin: 10px 0;
+    font-family: var(--font-mono);
+    font-size: 12px;
+    overflow-x: auto;
+    white-space: pre-wrap;
+  }
+
+  .msg-bubble code {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    color: var(--accent-primary);
+    background: rgba(0, 229, 200, 0.08);
+    padding: 2px 6px;
+  }
+
+  /* TYPING INDICATOR */
+  .typing-indicator {
+    display: flex;
+    gap: 4px;
+    padding: 4px 0;
+  }
+
+  .typing-dot {
+    width: 6px;
+    height: 6px;
+    background: var(--accent-primary);
+    animation: typing 1s infinite;
+  }
+
+  .typing-dot:nth-child(2) { animation-delay: 0.2s; }
+  .typing-dot:nth-child(3) { animation-delay: 0.4s; }
+
+  @keyframes typing {
+    0%, 100% { opacity: 0.2; transform: scale(0.8); }
+    50% { opacity: 1; transform: scale(1); }
+  }
+
+  /* INPUT AREA */
+  .input-area {
+    background: var(--bg-secondary);
+    border-top: 1px solid var(--border);
+    padding: 16px 24px;
+    position: relative;
+    z-index: 1;
+  }
+
+  .input-area::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--accent-primary), transparent);
+    opacity: 0.3;
+  }
+
+  .input-row {
+    display: flex;
+    gap: 12px;
+    align-items: flex-end;
+  }
+
+  .input-wrapper {
+    flex: 1;
+    position: relative;
+  }
+
+  .chat-input {
+    width: 100%;
+    background: var(--bg-tertiary);
+    border: 1px solid var(--border);
+    color: var(--text-primary);
+    font-family: var(--font-body);
+    font-size: 14px;
+    padding: 12px 16px;
+    resize: none;
+    outline: none;
+    min-height: 48px;
+    max-height: 200px;
+    line-height: 1.5;
+    transition: border-color 0.15s;
+  }
+
+  .chat-input:focus { border-color: var(--accent-primary); }
+  .chat-input::placeholder { color: var(--text-muted); }
+
+  .send-btn {
+    background: var(--accent-dim);
+    border: 1px solid var(--accent-border);
+    color: var(--accent-primary);
+    font-family: var(--font-display);
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 2px;
+    padding: 0 20px;
+    height: 48px;
+    cursor: pointer;
+    transition: all 0.15s;
+    white-space: nowrap;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .send-btn:hover:not(:disabled) {
+    background: rgba(0, 229, 200, 0.15);
+    box-shadow: 0 0 20px rgba(0, 229, 200, 0.1);
+  }
+
+  .send-btn:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+  }
+
+  .send-icon { font-size: 16px; }
+
+  .input-meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 8px;
+  }
+
+  .input-hint {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    color: var(--text-muted);
+  }
+
+  .token-count {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    color: var(--text-muted);
+  }
+
+  /* CONNECTION OVERLAY */
+  .conn-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(7, 13, 15, 0.95);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  .conn-title {
+    font-family: var(--font-display);
+    font-size: 20px;
+    font-weight: 600;
+    letter-spacing: 4px;
+    color: var(--accent-primary);
+  }
+
+  .conn-status {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    color: var(--text-muted);
+  }
+
+  .conn-input-row {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+  }
+
+  .conn-input {
+    background: var(--bg-tertiary);
+    border: 1px solid var(--border);
+    color: var(--text-primary);
+    font-family: var(--font-mono);
+    font-size: 12px;
+    padding: 10px 14px;
+    width: 280px;
+    outline: none;
+  }
+
+  .conn-input:focus { border-color: var(--accent-primary); }
+
+  .conn-btn {
+    background: var(--accent-dim);
+    border: 1px solid var(--accent-border);
+    color: var(--accent-primary);
+    font-family: var(--font-display);
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 2px;
+    padding: 10px 20px;
+    cursor: pointer;
+  }
+
+  .conn-btn:hover { background: rgba(0, 229, 200, 0.15); }
+  .conn-error { color: var(--danger); font-family: var(--font-mono); font-size: 11px; }
+
+  /* SCROLLBAR */
+  ::-webkit-scrollbar { width: 4px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: var(--text-muted); }
+</style>
+</head>
+<body>
+
+<!-- CONNECTION OVERLAY -->
+<div class="conn-overlay" id="connOverlay">
+  <svg class="welcome-hex" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <polygon points="50,5 90,27.5 90,72.5 50,95 10,72.5 10,27.5" stroke="#00e5c8" stroke-width="1.5" fill="none" opacity="0.4"/>
+    <polygon points="50,15 82,32.5 82,67.5 50,85 18,67.5 18,32.5" stroke="#00e5c8" stroke-width="1" fill="none" opacity="0.6"/>
+    <polygon points="50,25 74,37.5 74,62.5 50,75 26,62.5 26,37.5" stroke="#00e5c8" stroke-width="1" fill="rgba(0,229,200,0.05)"/>
+    <text x="50" y="55" text-anchor="middle" font-family="Rajdhani" font-size="14" fill="#00e5c8" font-weight="700">AEGIS</text>
+  </svg>
+  <div class="conn-title">SYSTEM INITIALIZATION</div>
+  <div class="conn-status" id="connStatus">OLLAMA 서버에 연결 중...</div>
+  <div class="conn-input-row">
+    <input class="conn-input" id="ollamaUrl" value="http://localhost:11434" placeholder="Ollama URL">
+    <button class="conn-btn" onclick="connectToOllama()">연결</button>
+  </div>
+  <div class="conn-error" id="connError"></div>
+  <div class="conn-status" style="font-size:10px; margin-top:8px; opacity:0.5;">
+    WSL에서 실행 시: http://localhost:11434
+  </div>
+</div>
+
+<!-- TOP BAR -->
+<div class="topbar">
+  <div class="logo">
+    <div class="logo-icon">
+      <svg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <polygon points="20,2 36,11 36,29 20,38 4,29 4,11" stroke="#00e5c8" stroke-width="1.5" fill="none"/>
+        <polygon points="20,8 32,15 32,25 20,32 8,25 8,15" stroke="#00e5c8" stroke-width="0.8" fill="rgba(0,229,200,0.05)"/>
+        <line x1="20" y1="2" x2="20" y2="38" stroke="#00e5c8" stroke-width="0.5" opacity="0.3"/>
+        <line x1="4" y1="11" x2="36" y2="29" stroke="#00e5c8" stroke-width="0.5" opacity="0.3"/>
+        <line x1="36" y1="11" x2="4" y2="29" stroke="#00e5c8" stroke-width="0.5" opacity="0.3"/>
+        <circle cx="20" cy="20" r="4" fill="#00e5c8" opacity="0.8"/>
+      </svg>
+    </div>
+    <div>
+      <div class="logo-text">AEGIS AI</div>
+      <div class="logo-sub">DEFENSE INTELLIGENCE SYSTEM v2.1</div>
+    </div>
+  </div>
+  <div class="status-bar">
+    <div class="status-item">
+      <div class="status-dot" id="modelDot"></div>
+      <span id="modelStatusText">모델 연결 중</span>
+    </div>
+    <div class="status-item">
+      <div class="status-dot"></div>
+      <span>OLLAMA ONLINE</span>
+    </div>
+    <div class="clearance-badge">기밀 · CLASSIFIED</div>
+  </div>
+</div>
+
+<!-- MAIN LAYOUT -->
+<div class="main-layout">
+
+  <!-- SIDEBAR -->
+  <div class="sidebar">
+    <div class="sidebar-section">
+      <div class="sidebar-label">// SYSTEM MODEL</div>
+      <div class="model-info">
+        <div class="model-name" id="currentModelName">EXAONE 3.5</div>
+        <div class="model-detail" id="currentModelDetail">LG AI RESEARCH · KO/EN</div>
+      </div>
+      <select class="model-selector" id="modelSelector" onchange="changeModel(this.value)">
+        <option value="exaone3.5:2.4b">EXAONE 3.5 · 2.4B</option>
+        <option value="exaone3.5:7.8b" selected>EXAONE 3.5 · 7.8B</option>
+        <option value="exaone3.5:32b">EXAONE 3.5 · 32B</option>
+        <option value="exaone-deep:2.4b">EXAONE Deep · 2.4B</option>
+        <option value="exaone-deep:7.8b">EXAONE Deep · 7.8B</option>
+        <option value="llama3.2:3b">Llama 3.2 · 3B</option>
+        <option value="mistral:7b">Mistral · 7B</option>
+      </select>
+    </div>
+
+    <div class="sidebar-section">
+      <div class="sidebar-label">// PARAMETERS</div>
+      <div class="param-row">
+        <span class="param-label">Temperature</span>
+        <span class="param-value" id="tempVal">0.7</span>
+      </div>
+      <input class="param-slider" type="range" min="0" max="2" step="0.1" value="0.7"
+        oninput="document.getElementById('tempVal').textContent=parseFloat(this.value).toFixed(1); temperature=parseFloat(this.value)">
+      <div class="param-row" style="margin-top:10px">
+        <span class="param-label">Max Tokens</span>
+        <span class="param-value" id="tokensVal">2048</span>
+      </div>
+      <input class="param-slider" type="range" min="256" max="8192" step="256" value="2048"
+        oninput="document.getElementById('tokensVal').textContent=parseInt(this.value); maxTokens=parseInt(this.value)">
+      <div class="param-row" style="margin-top:10px">
+        <span class="param-label">Context Window</span>
+        <span class="param-value" id="ctxVal">4096</span>
+      </div>
+      <input class="param-slider" type="range" min="1024" max="32768" step="1024" value="4096"
+        oninput="document.getElementById('ctxVal').textContent=parseInt(this.value); contextSize=parseInt(this.value)">
+    </div>
+
+    <div class="sidebar-section">
+      <div class="sidebar-label">// MISSION PROFILE</div>
+      <button class="mission-btn active" onclick="setMission(this, 'general')">
+        <span class="mission-icon">◈</span> GENERAL OPS
+      </button>
+      <button class="mission-btn" onclick="setMission(this, 'intel')">
+        <span class="mission-icon">◈</span> INTELLIGENCE ANALYSIS
+      </button>
+      <button class="mission-btn" onclick="setMission(this, 'tactical')">
+        <span class="mission-icon">◈</span> TACTICAL PLANNING
+      </button>
+      <button class="mission-btn" onclick="setMission(this, 'logistics')">
+        <span class="mission-icon">◈</span> LOGISTICS & SUPPLY
+      </button>
+      <button class="mission-btn" onclick="setMission(this, 'comms')">
+        <span class="mission-icon">◈</span> COMMUNICATIONS
+      </button>
+      <button class="mission-btn" onclick="setMission(this, 'medical')">
+        <span class="mission-icon">◈</span> FIELD MEDICAL
+      </button>
+    </div>
+
+    <div class="history-section">
+      <div class="sidebar-label">// SESSION LOG</div>
+      <div id="historyList"></div>
+    </div>
+
+    <button class="new-chat-btn" onclick="newChat()">+ NEW SESSION</button>
+  </div>
+
+  <!-- CHAT AREA -->
+  <div class="chat-container">
+    <div class="messages-area" id="messagesArea">
+      <div class="welcome-screen" id="welcomeScreen">
+        <svg class="welcome-hex" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <polygon points="50,5 90,27.5 90,72.5 50,95 10,72.5 10,27.5" stroke="#00e5c8" stroke-width="1.5" fill="none" opacity="0.4"/>
+          <polygon points="50,15 82,32.5 82,67.5 50,85 18,67.5 18,32.5" stroke="#00e5c8" stroke-width="1" fill="none" opacity="0.6"/>
+          <polygon points="50,25 74,37.5 74,62.5 50,75 26,62.5 26,37.5" stroke="#00e5c8" stroke-width="1" fill="rgba(0,229,200,0.05)"/>
+          <circle cx="50" cy="50" r="6" fill="#00e5c8"/>
+          <line x1="50" y1="5" x2="50" y2="25" stroke="#00e5c8" stroke-width="1"/>
+          <line x1="50" y1="75" x2="50" y2="95" stroke="#00e5c8" stroke-width="1"/>
+          <line x1="10" y1="27.5" x2="26" y2="37.5" stroke="#00e5c8" stroke-width="1"/>
+          <line x1="74" y1="62.5" x2="90" y2="72.5" stroke="#00e5c8" stroke-width="1"/>
+          <line x1="90" y1="27.5" x2="74" y2="37.5" stroke="#00e5c8" stroke-width="1"/>
+          <line x1="26" y1="62.5" x2="10" y2="72.5" stroke="#00e5c8" stroke-width="1"/>
+        </svg>
+        <div class="welcome-title">AEGIS AI</div>
+        <div class="welcome-sub">DEFENSE INTELLIGENCE · READY FOR OPERATION</div>
+        <div class="quick-actions">
+          <button class="quick-action" onclick="quickPrompt('현재 상황 보고서를 작성하는 데 도움을 줘. 부대 현황, 임무 진행 상황, 특이사항을 포함해줘.')">
+            <div class="qa-tag">SITREP</div>
+            <div class="qa-text">상황 보고서 작성 지원</div>
+          </button>
+          <button class="quick-action" onclick="quickPrompt('적 동향 분석 보고서 작성을 도와줘. 수집된 첩보를 바탕으로 위협 평가를 해줘.')">
+            <div class="qa-tag">INTEL</div>
+            <div class="qa-text">적 동향 분석 보고서</div>
+          </button>
+          <button class="quick-action" onclick="quickPrompt('작전 계획서 초안 작성을 도와줘. 임무 목표, 기동 계획, 화력 지원, 군수 지원 계획을 포함해줘.')">
+            <div class="qa-tag">OPLAN</div>
+            <div class="qa-text">작전 계획서 초안 작성</div>
+          </button>
+          <button class="quick-action" onclick="quickPrompt('군수 지원 현황을 정리하고 보급 요청서 작성을 도와줘.')">
+            <div class="qa-tag">LOG</div>
+            <div class="qa-text">군수 지원 현황 정리</div>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div class="input-area">
+      <div class="input-row">
+        <div class="input-wrapper">
+          <textarea class="chat-input" id="chatInput"
+            placeholder="명령을 입력하십시오... (Shift+Enter: 줄바꿈 / Enter: 전송)"
+            rows="1"
+            onkeydown="handleKey(event)"
+            oninput="autoResize(this)"></textarea>
+        </div>
+        <button class="send-btn" id="sendBtn" onclick="sendMessage()">
+          <span>SEND</span>
+          <span class="send-icon">▶</span>
+        </button>
+      </div>
+      <div class="input-meta">
+        <span class="input-hint">MISSION: <span id="currentMission" style="color:var(--accent-primary)">GENERAL OPS</span></span>
+        <span class="token-count" id="tokenCount">0 chars</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+let ollamaUrl = 'http://localhost:11434';
+let selectedModel = 'exaone3.5:7.8b';
+let temperature = 0.7;
+let maxTokens = 2048;
+let contextSize = 4096;
+let messages = [];
+let isGenerating = false;
+let sessions = [];
+let currentSessionId = null;
+let currentMissionProfile = 'general';
+
+const missionPrompts = {
+  general: '당신은 대한민국 군의 AI 보조 시스템 AEGIS입니다. 군 관련 업무를 전문적으로 지원하며, 정확하고 간결한 군사 용어를 사용하여 답변합니다.',
+  intel: '당신은 정보 분석 전문 AI 시스템입니다. 수집된 첩보를 분석하고 위협을 평가하며, 상황 판단에 도움이 되는 정보를 제공합니다. 분석은 체계적이고 객관적으로 수행합니다.',
+  tactical: '당신은 전술 계획 지원 AI 시스템입니다. 작전 계획, 기동 방안, 화력 운용, 전술적 판단 등을 지원합니다. METT-TC 분석 등 군사 계획 수립 방법론을 활용합니다.',
+  logistics: '당신은 군수 지원 AI 시스템입니다. 보급, 정비, 수송, 의무 지원 등 군수 분야를 전문으로 지원합니다. 효율적인 자원 관리와 지속 지원 방안을 제시합니다.',
+  comms: '당신은 통신 지원 AI 시스템입니다. 통신망 운용, 암호화, 교신 절차, 전자전 대응 등 통신 분야를 지원합니다.',
+  medical: '당신은 야전 의무 지원 AI 시스템입니다. 전투 응급처치, 후송 절차, 의무 자원 관리, 전투 스트레스 관리 등 야전 의무 분야를 지원합니다.'
+};
+
+const missionNames = {
+  general: 'GENERAL OPS',
+  intel: 'INTEL ANALYSIS',
+  tactical: 'TACTICAL PLAN',
+  logistics: 'LOGISTICS',
+  comms: 'COMMUNICATIONS',
+  medical: 'FIELD MEDICAL'
+};
+
+async function connectToOllama() {
+  const urlInput = document.getElementById('ollamaUrl');
+  ollamaUrl = urlInput.value.trim().replace(/\/$/, '');
+  document.getElementById('connStatus').textContent = '연결 시도 중...';
+  document.getElementById('connError').textContent = '';
+
+  try {
+    const resp = await fetch(`${ollamaUrl}/api/tags`, { method: 'GET' });
+    if (!resp.ok) throw new Error('서버 응답 오류');
+    const data = await resp.json();
+    document.getElementById('connOverlay').style.display = 'none';
+    document.getElementById('modelDot').className = 'status-dot';
+    document.getElementById('modelStatusText').textContent = selectedModel.toUpperCase();
+
+    if (data.models && data.models.length > 0) {
+      populateModelSelector(data.models);
+    }
+  } catch (e) {
+    document.getElementById('connError').textContent = '연결 실패: ' + e.message + ' — Ollama가 실행 중인지 확인하세요.';
+  }
+}
+
+function populateModelSelector(models) {
+  const sel = document.getElementById('modelSelector');
+  sel.innerHTML = '';
+  models.forEach(m => {
+    const opt = document.createElement('option');
+    opt.value = m.name;
+    opt.textContent = m.name.toUpperCase();
+    if (m.name.includes('exaone')) opt.selected = true;
+    sel.appendChild(opt);
+  });
+  if (sel.value) {
+    selectedModel = sel.value;
+    document.getElementById('currentModelName').textContent = sel.value.split(':')[0].toUpperCase();
+  }
+}
+
+function changeModel(val) {
+  selectedModel = val;
+  const name = val.split(':')[0].toUpperCase();
+  document.getElementById('currentModelName').textContent = name;
+  document.getElementById('modelStatusText').textContent = val.toUpperCase();
+}
+
+function setMission(btn, type) {
+  document.querySelectorAll('.mission-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  currentMissionProfile = type;
+  document.getElementById('currentMission').textContent = missionNames[type];
+}
+
+function quickPrompt(text) {
+  document.getElementById('chatInput').value = text;
+  document.getElementById('welcomeScreen') && (document.getElementById('welcomeScreen').style.display = 'none');
+  sendMessage();
+}
+
+function autoResize(el) {
+  el.style.height = 'auto';
+  el.style.height = Math.min(el.scrollHeight, 200) + 'px';
+  document.getElementById('tokenCount').textContent = el.value.length + ' chars';
+}
+
+function handleKey(e) {
+  if (e.key === 'Enter' && !e.shiftKey) {
+    e.preventDefault();
+    sendMessage();
+  }
+}
+
+function newChat() {
+  if (messages.length > 0) {
+    const firstMsg = messages.find(m => m.role === 'user');
+    if (firstMsg) {
+      sessions.unshift({ id: Date.now(), title: firstMsg.content.slice(0, 30) + '...', time: new Date().toLocaleTimeString('ko-KR', {hour:'2-digit', minute:'2-digit'}) });
+      updateHistoryList();
+    }
+  }
+  messages = [];
+  const area = document.getElementById('messagesArea');
+  area.innerHTML = `
+    <div class="welcome-screen" id="welcomeScreen">
+      <svg class="welcome-hex" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <polygon points="50,5 90,27.5 90,72.5 50,95 10,72.5 10,27.5" stroke="#00e5c8" stroke-width="1.5" fill="none" opacity="0.4"/>
+        <polygon points="50,25 74,37.5 74,62.5 50,75 26,62.5 26,37.5" stroke="#00e5c8" stroke-width="1" fill="rgba(0,229,200,0.05)"/>
+        <circle cx="50" cy="50" r="6" fill="#00e5c8"/>
+      </svg>
+      <div class="welcome-title">AEGIS AI</div>
+      <div class="welcome-sub">NEW SESSION INITIALIZED</div>
+    </div>`;
+}
+
+function updateHistoryList() {
+  const list = document.getElementById('historyList');
+  list.innerHTML = sessions.slice(0, 10).map(s => `
+    <div class="history-item">
+      <div class="history-title">${s.title}</div>
+      <div class="history-time">${s.time}</div>
+    </div>`).join('');
+}
+
+function formatTime() {
+  return new Date().toLocaleTimeString('ko-KR', {hour: '2-digit', minute: '2-digit', second: '2-digit'});
+}
+
+function addMessage(role, content) {
+  const welcome = document.getElementById('welcomeScreen');
+  if (welcome) welcome.remove();
+
+  const area = document.getElementById('messagesArea');
+  const div = document.createElement('div');
+  div.className = `message ${role}`;
+  div.innerHTML = `
+    <div class="msg-avatar ${role === 'assistant' ? 'ai' : 'user'}">${role === 'assistant' ? 'AI' : 'OP'}</div>
+    <div class="msg-content">
+      <div class="msg-header">
+        <span class="msg-sender">${role === 'assistant' ? 'AEGIS · ' + selectedModel.split(':')[0].toUpperCase() : 'OPERATOR'}</span>
+        <span class="msg-time">${formatTime()}</span>
+      </div>
+      <div class="msg-bubble ${role === 'assistant' ? 'ai' : 'user'}" id="bubble-${Date.now()}">${formatContent(content)}</div>
+    </div>`;
+  area.appendChild(div);
+  area.scrollTop = area.scrollHeight;
+  return div.querySelector('.msg-bubble');
+}
+
+function formatContent(text) {
+  return text
+    .replace(/```(\w*)\n?([\s\S]*?)```/g, '<pre><code>$2</code></pre>')
+    .replace(/`([^`]+)`/g, '<code>$1</code>')
+    .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+    .replace(/\n/g, '<br>');
+}
+
+function addTypingIndicator() {
+  const welcome = document.getElementById('welcomeScreen');
+  if (welcome) welcome.remove();
+
+  const area = document.getElementById('messagesArea');
+  const div = document.createElement('div');
+  div.className = 'message assistant';
+  div.id = 'typing-indicator';
+  div.innerHTML = `
+    <div class="msg-avatar ai">AI</div>
+    <div class="msg-content">
+      <div class="msg-header">
+        <span class="msg-sender">AEGIS · PROCESSING</span>
+        <span class="msg-time">${formatTime()}</span>
+      </div>
+      <div class="msg-bubble ai">
+        <div class="typing-indicator">
+          <div class="typing-dot"></div>
+          <div class="typing-dot"></div>
+          <div class="typing-dot"></div>
+        </div>
+      </div>
+    </div>`;
+  area.appendChild(div);
+  area.scrollTop = area.scrollHeight;
+  return div;
+}
+
+async function sendMessage() {
+  if (isGenerating) return;
+  const input = document.getElementById('chatInput');
+  const text = input.value.trim();
+  if (!text) return;
+
+  input.value = '';
+  input.style.height = 'auto';
+  document.getElementById('tokenCount').textContent = '0 chars';
+  document.getElementById('sendBtn').disabled = true;
+  isGenerating = true;
+
+  addMessage('user', text);
+  messages.push({ role: 'user', content: text });
+
+  const typingEl = addTypingIndicator();
+
+  try {
+    const systemPrompt = missionPrompts[currentMissionProfile];
+    const payload = {
+      model: selectedModel,
+      messages: [
+        { role: 'system', content: systemPrompt },
+        ...messages
+      ],
+      options: {
+        temperature: temperature,
+        num_predict: maxTokens,
+        num_ctx: contextSize
+      },
+      stream: true
+    };
+
+    const response = await fetch(`${ollamaUrl}/api/chat`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+
+    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+
+    typingEl.remove();
+    const bubble = addMessage('assistant', '').closest('.message').querySelector('.msg-bubble');
+    let fullText = '';
+
+    const reader = response.body.getReader();
+    const decoder = new TextDecoder();
+
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      const chunk = decoder.decode(value);
+      const lines = chunk.split('\n').filter(l => l.trim());
+      for (const line of lines) {
+        try {
+          const data = JSON.parse(line);
+          if (data.message?.content) {
+            fullText += data.message.content;
+            bubble.innerHTML = formatContent(fullText);
+            document.getElementById('messagesArea').scrollTop = document.getElementById('messagesArea').scrollHeight;
+          }
+          if (data.done) break;
+        } catch(e) {}
+      }
+    }
+
+    messages.push({ role: 'assistant', content: fullText });
+
+  } catch (e) {
+    typingEl.remove();
+    addMessage('assistant', `[ERROR] ${e.message}\n\nOllama 서버가 실행 중인지 확인하세요.\n\`ollama serve\` 명령으로 서버를 시작할 수 있습니다.`);
+  } finally {
+    isGenerating = false;
+    document.getElementById('sendBtn').disabled = false;
+    document.getElementById('chatInput').focus();
+  }
+}
+
+// Auto-connect on load
+window.onload = () => {
+  setTimeout(async () => {
+    try {
+      const resp = await fetch(`${ollamaUrl}/api/tags`);
+      if (resp.ok) {
+        const data = await resp.json();
+        document.getElementById('connOverlay').style.display = 'none';
+        document.getElementById('modelDot').className = 'status-dot';
+        document.getElementById('modelStatusText').textContent = selectedModel.toUpperCase();
+        if (data.models?.length > 0) populateModelSelector(data.models);
+      } else {
+        document.getElementById('connStatus').textContent = 'Ollama URL을 확인하고 연결하세요';
+      }
+    } catch(e) {
+      document.getElementById('connStatus').textContent = 'Ollama URL을 확인하고 연결하세요';
+    }
+  }, 500);
+};
+</script>
+</body>
+</html>
