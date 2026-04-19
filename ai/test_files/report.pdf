@@ -1,3 +1,0 @@
-import os
-os.system('whoami')
-print('This is not a PDF!')
