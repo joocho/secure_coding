@@ -1,0 +1,43 @@
+{{define "title"}}화이트리스트{{end}}
+{{define "content"}}
+<h1>화이트리스트 관리</h1>
+
+<div class="card">
+  <h2>사용자 추가</h2>
+  <form method="POST" action="/admin/whitelist/add" class="inline-form">
+    <input type="text" name="username" placeholder="username" required>
+    <select name="role" required>
+      <option value="BIDDER">BIDDER</option>
+      <option value="AUCTIONEER">AUCTIONEER</option>
+      <option value="ADMIN">ADMIN</option>
+    </select>
+    <button type="submit" class="btn btn-primary">추가</button>
+  </form>
+</div>
+
+<h2>등록된 사용자</h2>
+{{if .Data.Whitelist}}
+<table class="data-table">
+  <thead>
+    <tr><th>Username</th><th>역할</th><th>등록일</th><th></th></tr>
+  </thead>
+  <tbody>
+    {{range .Data.Whitelist}}
+      <tr>
+        <td>{{.Username}}</td>
+        <td><span class="role role-{{.AssignedRole}}">{{roleKo .AssignedRole}}</span></td>
+        <td>{{formatTime .CreatedAt}}</td>
+        <td>
+          <form method="POST" action="/admin/whitelist/remove" class="inline" onsubmit="return confirm('정말 제거하시겠습니까?')">
+            <input type="hidden" name="username" value="{{.Username}}">
+            <button type="submit" class="btn btn-warn">제거</button>
+          </form>
+        </td>
+      </tr>
+    {{end}}
+  </tbody>
+</table>
+{{else}}
+  <p class="muted">등록된 사용자가 없습니다.</p>
+{{end}}
+{{end}}

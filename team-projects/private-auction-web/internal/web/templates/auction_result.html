@@ -1,0 +1,44 @@
+{{define "title"}}낙찰 결과{{end}}
+{{define "content"}}
+{{$result := .Data.Result}}
+{{$auc := .Data.Auction}}
+{{$usernames := .Data.Usernames}}
+
+<h1>🏆 낙찰 결과 — {{if $auc}}{{$auc.Title}}{{end}}</h1>
+
+{{if $result.WinnerID}}
+  <div class="card winner-card">
+    <h2>낙찰자</h2>
+    <p class="winner-name">{{if $result.WinnerUsername}}{{$result.WinnerUsername}}{{else}}—{{end}}</p>
+    {{if $result.WinnerPrice}}
+      <p class="winner-price">₩ {{comma (deref $result.WinnerPrice)}}</p>
+    {{end}}
+    {{if .Data.IsWinner}}
+      <p class="you-won">🎉 축하합니다! 낙찰자입니다.</p>
+    {{end}}
+  </div>
+{{else}}
+  <p class="muted">이 경매에는 유효한 입찰이 없습니다.</p>
+{{end}}
+
+{{if $result.Bids}}
+<h2>전체 순위</h2>
+<table class="data-table">
+  <thead>
+    <tr><th>순위</th><th>입찰자</th><th>입찰가</th><th>커밋 해시</th></tr>
+  </thead>
+  <tbody>
+    {{range $i, $b := $result.Bids}}
+      <tr>
+        <td>{{add1 $i}}</td>
+        <td>{{index $usernames $b.UserID}}</td>
+        <td>{{if $b.Price}}₩ {{comma (deref $b.Price)}}{{else}}—{{end}}</td>
+        <td><code class="hash">{{truncate $b.CommitHash 16}}…</code></td>
+      </tr>
+    {{end}}
+  </tbody>
+</table>
+{{end}}
+
+<p><a class="btn btn-ghost" href="/auctions/{{$auc.ID}}">← 상세로</a></p>
+{{end}}

@@ -1,0 +1,36 @@
+{{define "title"}}경매 목록{{end}}
+{{define "content"}}
+<div class="row-between">
+  <h1>경매 목록</h1>
+  {{if .Data.CanCreate}}
+    <a href="/auctions/new" class="btn btn-primary">+ 새 경매 생성</a>
+  {{end}}
+</div>
+
+{{if .Data.Auctions}}
+<table class="data-table">
+  <thead>
+    <tr>
+      <th>제목</th>
+      <th>상태</th>
+      <th>시작</th>
+      <th>종료</th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    {{range .Data.Auctions}}
+      <tr>
+        <td>{{.Title}}</td>
+        <td><span class="status status-{{.Status}}">{{statusKo .Status}}</span></td>
+        <td>{{formatTime .StartAt}}</td>
+        <td>{{formatTime .EndAt}}</td>
+        <td><a class="btn btn-ghost" href="/auctions/{{.ID}}">상세</a></td>
+      </tr>
+    {{end}}
+  </tbody>
+</table>
+{{else}}
+  <p class="muted">등록된 경매가 없습니다.</p>
+{{end}}
+{{end}}

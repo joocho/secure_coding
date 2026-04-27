@@ -1,0 +1,40 @@
+{{define "title"}}사용자 관리{{end}}
+{{define "content"}}
+<h1>사용자 관리</h1>
+
+{{if .Data.Users}}
+<table class="data-table">
+  <thead>
+    <tr><th>Username</th><th>역할</th><th>실패 횟수</th><th>상태</th><th>가입일</th><th></th></tr>
+  </thead>
+  <tbody>
+    {{range .Data.Users}}
+      <tr>
+        <td>{{.Username}}</td>
+        <td><span class="role role-{{.Role}}">{{roleKo .Role}}</span></td>
+        <td>{{.FailedAttempts}}</td>
+        <td>
+          {{if .IsBanned}}<span class="status status-CLOSED">차단됨</span>
+          {{else}}<span class="status status-OPEN">정상</span>{{end}}
+        </td>
+        <td>{{formatTime .CreatedAt}}</td>
+        <td>
+          <form method="POST" action="/admin/users/ban" class="inline">
+            <input type="hidden" name="user_id" value="{{.ID}}">
+            {{if .IsBanned}}
+              <input type="hidden" name="action" value="unban">
+              <button type="submit" class="btn btn-ok">차단 해제</button>
+            {{else}}
+              <input type="hidden" name="action" value="ban">
+              <button type="submit" class="btn btn-warn" onclick="return confirm('정말 차단하시겠습니까?')">차단</button>
+            {{end}}
+          </form>
+        </td>
+      </tr>
+    {{end}}
+  </tbody>
+</table>
+{{else}}
+  <p class="muted">등록된 사용자가 없습니다.</p>
+{{end}}
+{{end}}

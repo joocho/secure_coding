@@ -1,0 +1,65 @@
+{{define "title"}}경매 상세{{end}}
+{{define "content"}}
+{{$auc := .Data.Auction}}
+<div class="row-between">
+  <h1>{{$auc.Title}}</h1>
+  <span class="status status-{{$auc.Status}}">{{statusKo $auc.Status}}</span>
+</div>
+
+<div class="card">
+  <dl class="details">
+    <dt>ID</dt><dd><code>{{$auc.ID}}</code></dd>
+    <dt>생성자</dt><dd><code>{{$auc.CreatedBy}}</code></dd>
+    <dt>시작</dt><dd>{{formatTime $auc.StartAt}}</dd>
+    <dt>종료</dt><dd>{{formatTime $auc.EndAt}}</dd>
+    <dt>KEK 버전</dt><dd>v{{$auc.KEKVersion}}</dd>
+    <dt>승인 수</dt><dd>{{len .Data.Approvals}} / 2 (Quorum)</dd>
+  </dl>
+</div>
+
+<div class="actions">
+  {{if and .Data.CanManage (eq $auc.Status "OPEN")}}
+    <form method="POST" action="/auctions/{{$auc.ID}}/close" class="inline">
+      <button type="submit" class="btn btn-warn">경매 마감</button>
+    </form>
+  {{end}}
+
+  {{if .Data.CanApprove}}
+    {{if .Data.AlreadyApproved}}
+      <span class="muted">✓ 이미 승인함</span>
+    {{else}}
+      <form method="POST" action="/auctions/{{$auc.ID}}/approve" class="inline">
+        <button type="submit" class="btn btn-ok">승인 서명</button>
+      </form>
+    {{end}}
+  {{end}}
+
+  {{if and .Data.CanManage (eq $auc.Status "CLOSED")}}
+    <form method="POST" action="/auctions/{{$auc.ID}}/reveal" class="inline">
+      <button type="submit" class="btn btn-primary" onclick="return confirm('결과를 공개하시겠습니까? 2명 이상의 승인이 필요합니다.')">결과 공개</button>
+    </form>
+  {{end}}
+
+  {{if eq $auc.Status "REVEALED"}}
+    <a href="/auctions/{{$auc.ID}}/result" class="btn btn-primary">낙찰 결과 보기</a>
+  {{end}}
+</div>
+
+{{if .Data.CanBid}}
+<div class="card">
+  <h2>💰 입찰하기</h2>
+  <form method="POST" action="/auctions/{{$auc.ID}}/bid">
+    <label>
+      입찰가 (정수)
+      <input type="number" name="price" required min="1" step="1" placeholder="예: 1500000">
+    </label>
+    <p class="muted">
+      제출 시: AES-256-GCM으로 입찰가를 암호화 → RSA-4096 OAEP로 DEK 봉인 → Ed25519 서명
+    </p>
+    <button type="submit" class="btn btn-primary">암호화 후 제출</button>
+  </form>
+</div>
+{{end}}
+
+<p><a class="btn btn-ghost" href="/auctions">← 목록으로</a></p>
+{{end}}

@@ -1,0 +1,25 @@
+{{define "title"}}회원가입{{end}}
+{{define "content"}}
+<div class="card auth-card">
+  <h1>회원가입</h1>
+  <form method="POST" action="/register">
+    <label>
+      아이디
+      <input type="text" name="username" required minlength="4" maxlength="20">
+    </label>
+    <label>
+      비밀번호
+      <input type="password" name="password" required minlength="8" maxlength="32">
+    </label>
+    <label>
+      비밀번호 확인
+      <input type="password" name="confirm" required minlength="8" maxlength="32">
+    </label>
+    <p class="muted">
+      ✓ 8~32자, 대/소문자 + 숫자 + 특수문자 각 1자 이상
+    </p>
+    <button type="submit" class="btn btn-primary">가입</button>
+  </form>
+  <p class="muted">이미 계정이 있으신가요? <a href="/login">로그인</a></p>
+</div>
+{{end}}

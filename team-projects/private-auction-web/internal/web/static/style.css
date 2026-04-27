@@ -1,0 +1,183 @@
+/* 블라인드 경매 웹 UI — 미니멀 스타일 */
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0; padding: 0;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial,
+               "Noto Sans KR", "Apple SD Gothic Neo", sans-serif;
+  background: #f5f6fa;
+  color: #1f2937;
+}
+
+a { color: #4f46e5; text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+/* ── 상단바 ────────────────────────────── */
+.topbar {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0.75rem 1.5rem;
+  background: #1f2937; color: white;
+}
+.topbar .brand {
+  color: white; font-weight: bold; font-size: 1.1rem;
+}
+.topbar nav { display: flex; gap: 1rem; align-items: center; }
+.topbar nav a { color: #e5e7eb; }
+.topbar nav a:hover { color: white; text-decoration: none; }
+
+.user-info { display: flex; gap: 0.5rem; align-items: center; }
+.user-info strong { color: #fde68a; }
+
+/* ── 컨테이너 ──────────────────────────── */
+.container {
+  max-width: 980px;
+  margin: 2rem auto;
+  padding: 0 1.5rem;
+}
+
+.foot {
+  text-align: center;
+  padding: 2rem 1rem;
+  color: #9ca3af;
+}
+
+/* ── 카드 ──────────────────────────────── */
+.card {
+  background: white;
+  border-radius: 10px;
+  padding: 1.5rem 2rem;
+  box-shadow: 0 1px 3px rgba(0,0,0,.08);
+  margin-bottom: 1.5rem;
+}
+.auth-card { max-width: 420px; margin: 3rem auto; }
+
+.cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 1rem; }
+.tile { transition: transform .15s; display: block; color: inherit; }
+.tile:hover { transform: translateY(-2px); text-decoration: none; }
+.tile h2 { margin: 0 0 0.5rem; color: #4f46e5; font-size: 1.1rem; }
+.tile p  { margin: 0; color: #6b7280; }
+
+/* ── 폼 ────────────────────────────────── */
+form label { display: block; margin-bottom: 0.9rem; font-size: 0.9rem; color: #374151; }
+form input[type="text"],
+form input[type="password"],
+form input[type="number"],
+form input[type="datetime-local"],
+form select {
+  display: block;
+  width: 100%;
+  padding: 0.55rem 0.75rem;
+  margin-top: 0.25rem;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  font-size: 1rem;
+  background: white;
+}
+form input:focus, form select:focus {
+  outline: none; border-color: #4f46e5;
+  box-shadow: 0 0 0 3px rgba(79,70,229,.15);
+}
+
+.inline { display: inline; }
+.inline-form { display: flex; gap: 0.5rem; align-items: center; flex-wrap: wrap; }
+.inline-form input, .inline-form select { flex: 1 1 auto; margin: 0; width: auto; }
+
+/* ── 버튼 ──────────────────────────────── */
+.btn {
+  display: inline-block;
+  padding: 0.5rem 1rem;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  cursor: pointer;
+  background: white;
+  color: #111827;
+  text-decoration: none;
+  margin-right: 0.3rem;
+}
+.btn:hover { text-decoration: none; }
+.btn-primary { background: #4f46e5; color: white; border-color: #4f46e5; }
+.btn-primary:hover { background: #4338ca; }
+.btn-ok       { background: #10b981; color: white; border-color: #10b981; }
+.btn-ok:hover { background: #059669; }
+.btn-warn     { background: #f59e0b; color: white; border-color: #f59e0b; }
+.btn-warn:hover { background: #d97706; }
+.btn-ghost    { background: transparent; border-color: #d1d5db; color: #374151; }
+.btn-ghost:hover { background: #f3f4f6; }
+
+/* ── 표 ────────────────────────────────── */
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: white;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 1px 3px rgba(0,0,0,.06);
+}
+.data-table th, .data-table td {
+  text-align: left;
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid #f3f4f6;
+}
+.data-table th {
+  background: #f9fafb;
+  color: #374151;
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+.data-table tr:last-child td { border-bottom: none; }
+
+/* ── 상태 뱃지 ─────────────────────────── */
+.status {
+  display: inline-block;
+  padding: 0.2rem 0.6rem;
+  border-radius: 999px;
+  font-size: 0.8rem;
+  font-weight: bold;
+}
+.status-OPEN     { background: #d1fae5; color: #047857; }
+.status-CLOSED   { background: #fed7aa; color: #9a3412; }
+.status-REVEALED { background: #e9d5ff; color: #6b21a8; }
+
+.role {
+  display: inline-block;
+  padding: 0.15rem 0.5rem;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  font-weight: bold;
+}
+.role-ADMIN      { background: #fde68a; color: #78350f; }
+.role-AUCTIONEER { background: #c7d2fe; color: #3730a3; }
+.role-BIDDER     { background: #a7f3d0; color: #065f46; }
+.role-GUEST      { background: #e5e7eb; color: #4b5563; }
+
+/* ── 플래시 ────────────────────────────── */
+.flash {
+  max-width: 980px;
+  margin: 1rem auto 0;
+  padding: 0.8rem 1.2rem;
+  border-radius: 8px;
+  font-weight: 500;
+}
+.flash-ok  { background: #d1fae5; color: #047857; border-left: 4px solid #10b981; }
+.flash-err { background: #fee2e2; color: #991b1b; border-left: 4px solid #ef4444; }
+
+/* ── 기타 ──────────────────────────────── */
+.row-between { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; }
+.muted { color: #6b7280; font-size: 0.9rem; }
+.actions { display: flex; gap: 0.4rem; margin: 1rem 0; flex-wrap: wrap; align-items: center; }
+
+.details { display: grid; grid-template-columns: max-content 1fr; gap: 0.5rem 1.2rem; margin: 0; }
+.details dt { color: #6b7280; font-weight: 500; }
+.details dd { margin: 0; color: #111827; }
+
+.hash { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.85rem; color: #6b7280; }
+code { background: #f3f4f6; padding: 0.1rem 0.3rem; border-radius: 3px; font-size: 0.85rem; }
+
+.winner-card { text-align: center; background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%); border: 2px solid #f59e0b; }
+.winner-name  { font-size: 1.8rem; font-weight: bold; color: #78350f; margin: 0.5rem 0; }
+.winner-price { font-size: 2.2rem; font-weight: bold; color: #b45309; margin: 0.5rem 0; }
+.you-won      { color: #10b981; font-weight: bold; margin-top: 1rem; }
+
+h1 { margin-top: 0; }

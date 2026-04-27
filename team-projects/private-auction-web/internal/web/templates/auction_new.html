@@ -1,0 +1,23 @@
+{{define "title"}}새 경매 생성{{end}}
+{{define "content"}}
+<div class="card">
+  <h1>새 경매 생성</h1>
+  <form method="POST" action="/auctions/new">
+    <label>
+      제목
+      <input type="text" name="title" required minlength="2" maxlength="100">
+    </label>
+    <label>
+      시작 시각
+      <input type="datetime-local" name="start_at" required>
+    </label>
+    <label>
+      종료 시각
+      <input type="datetime-local" name="end_at" required>
+    </label>
+    <p class="muted">생성 시 RSA-4096 키쌍이 자동으로 발급되어 KEK로 봉인 저장됩니다.</p>
+    <button type="submit" class="btn btn-primary">생성</button>
+    <a href="/auctions" class="btn btn-ghost">취소</a>
+  </form>
+</div>
+{{end}}

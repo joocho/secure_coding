@@ -1,0 +1,47 @@
+{{define "layout"}}<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{{block "title" .}}블라인드 경매{{end}}</title>
+<link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+<header class="topbar">
+  <a href="/" class="brand">🔒 블라인드 경매</a>
+  <nav>
+    {{if .User}}
+      <a href="/dashboard">대시보드</a>
+      <a href="/auctions">경매</a>
+      {{if eq .User.Role "ADMIN"}}
+        <a href="/admin/whitelist">화이트리스트</a>
+        <a href="/admin/users">사용자</a>
+      {{end}}
+      <span class="user-info">
+        <span class="role role-{{.User.Role}}">{{roleKo .User.Role}}</span>
+        <strong>{{.User.Username}}</strong>
+      </span>
+      <form method="POST" action="/logout" class="inline">
+        <button type="submit" class="btn btn-ghost">로그아웃</button>
+      </form>
+    {{else}}
+      <a href="/login">로그인</a>
+      <a href="/register">회원가입</a>
+    {{end}}
+  </nav>
+</header>
+
+{{if .FlashMsg}}
+  <div class="flash flash-{{.FlashKind}}">{{.FlashMsg}}</div>
+{{end}}
+
+<main class="container">
+  {{block "content" .}}{{end}}
+</main>
+
+<footer class="foot">
+  <small>보안 강화형 전자 봉인입찰 시스템 developed by 서예솔 and 차아미</small>
+</footer>
+</body>
+</html>
+{{end}}
