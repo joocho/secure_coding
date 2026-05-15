@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="referrer" content="no-referrer">
+<title>익명 Q&amp;A</title>
+<style>
+  body { font-family: system-ui, -apple-system, sans-serif; max-width: 720px; margin: 2em auto; padding: 0 1em; color: #222; }
+  h1 { font-size: 1.4em; }
+  .ask-link { display: inline-block; padding: 0.5em 1em; background: #0066cc; color: white; text-decoration: none; border-radius: 4px; }
+  .question { border: 1px solid #ddd; padding: 1em; margin: 1em 0; border-radius: 4px; background: #fafafa; }
+  .question pre { white-space: pre-wrap; word-wrap: break-word; margin: 0; font-family: inherit; }
+  .meta { color: #888; font-size: 0.85em; margin-top: 0.5em; }
+  .empty { color: #666; padding: 2em; text-align: center; }
+</style>
+</head>
+<body>
+<h1>익명 질문 게시판</h1>
+<p>
+  <a class="ask-link" href="/ask">질문하기</a>
+  <a class="ask-link" href="/claim" style="background:#555;margin-left:0.4em;">토큰 받기</a>
+</p>
+
+{% for q in questions %}
+  <div class="question">
+    <pre>{{ q.content }}</pre>
+    <div class="meta">#{{ q.id }}</div>
+  </div>
+{% else %}
+  <p class="empty">아직 질문이 없습니다.</p>
+{% endfor %}
+
+</body>
+</html>
